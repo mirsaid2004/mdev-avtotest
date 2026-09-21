@@ -1,0 +1,154 @@
+{
+  "app": {
+    "name": "MDEV-Avtotest",
+    "tagline": "Yo'l harakati qoidalari imtihoniga tayyorgarlik"
+  },
+  "nav": {
+    "home": "Bosh sahifa",
+    "tests": "Testlar",
+    "bank": "Savollar",
+    "stats": "Natijalar",
+    "settings": "Sozlamalar"
+  },
+  "action": {
+    "start": "Boshlash",
+    "next": "Keyingi",
+    "prev": "Oldingi",
+    "finish": "Yakunlash",
+    "retry": "Qayta urinish",
+    "continue": "Davom etish",
+    "cancel": "Bekor qilish",
+    "close": "Yopish",
+    "save": "Saqlash",
+    "discard": "O'chirish",
+    "drill": "Mashq qilish"
+  },
+  "state": {
+    "loading": "Yuklanmoqda...",
+    "error": "Xatolik yuz berdi",
+    "empty": "Hech narsa topilmadi",
+    "errorBank": "Savollar bazasini yuklab bo'lmadi"
+  },
+  "theme": {
+    "label": "Mavzu",
+    "light": "Yorug'",
+    "dark": "Qorong'i",
+    "system": "Tizim"
+  },
+  "language": {
+    "label": "Til"
+  },
+  "home": {
+    "unfinished": "Tugallanmagan test",
+    "answeredOf": "{{total}} tadan {{count}} tasi javoblangan",
+    "today": "Bugun",
+    "questionsAnswered": "savolga javob berildi",
+    "streak": "Ketma-ketlik",
+    "daysInRow_one": "kun ketma-ket",
+    "daysInRow_other": "kun ketma-ket",
+    "tests20": "20 savolli testlar",
+    "tests10": "10 savolli testlar",
+    "testsMeta": "{{count}} ta test · {{minutes}} daqiqa",
+    "exam": "Imtihon",
+    "examMeta": "{{count}} ta tasodifiy savol · {{minutes}} daqiqa · eng ko'pi {{mistakes}} xato",
+    "practice": "Xatolar ustida ishlash",
+    "practiceMeta": "{{count}} ta savol takrorlashni talab qiladi",
+    "coverage": "Baza qamrovi"
+  },
+  "tests": {
+    "meta": "{{count}} ta savol · {{minutes}} daqiqa · darhol javob",
+    "tab20": "20 savol",
+    "tab10": "10 savol"
+  },
+  "test": {
+    "question": "Savol",
+    "of": "dan",
+    "correct": "To'g'ri javob",
+    "incorrect": "Sizning javobingiz",
+    "score": "Natija",
+    "timeLeft": "Qolgan vaqt",
+    "mistakes": "{{count}}/{{max}} xato",
+    "flag": "Belgilab qo'yish",
+    "leaveTitle": "Testdan chiqasizmi?",
+    "leaveBody": "Javoblaringiz saqlanadi - qaytganingizda davom ettirasiz, vaqt esa to'xtatib turiladi.",
+    "submitTitle": "Testni yakunlaysizmi?",
+    "submitAllAnswered": "Barcha savollarga javob berilgan.",
+    "submitUnanswered_one": "{{count}} ta savol javobsiz qoldi. Javobsiz savol xato hisoblanadi.",
+    "submitUnanswered_other": "{{count}} ta savol javobsiz qoldi. Javobsiz savollar xato hisoblanadi."
+  },
+  "results": {
+    "passed": "O'TDINGIZ",
+    "failed": "O'TMADINGIZ",
+    "meta": "{{wrong}} ta xato · {{time}} sarflandi",
+    "maxAllowed": "eng ko'pi {{count}} ta ruxsat etiladi",
+    "review": "Tahlil",
+    "tabWrong": "Xatolar ({{count}})",
+    "tabAll": "Barchasi ({{count}})",
+    "leftBlank": "Javob berilmagan",
+    "drillMistakes": "Xatolarni mashq qilish"
+  },
+  "stats": {
+    "currentStreak": "Joriy ketma-ketlik",
+    "longestStreak": "Eng uzun ketma-ketlik",
+    "accuracy": "Aniqlik",
+    "timeStudied": "O'qilgan vaqt",
+    "days_one": "kun",
+    "days_other": "kun",
+    "activity": "Faollik",
+    "answeredLastYear": "so'nggi bir yilda javob berilgan savollar",
+    "noActivity": "Faollik yo'q",
+    "dayDetail": "{{count}} ta javob · {{percent}}% to'g'ri",
+    "less": "Kam",
+    "more": "Ko'p",
+    "coverage": "Baza qamrovi",
+    "mastered": "O'zlashtirilgan",
+    "learning": "O'rganilmoqda",
+    "unseen": "Ko'rilmagan",
+    "masteryNote": "O'zlashtirilgan = ketma-ket {{count}} marta to'g'ri javob berilgan.",
+    "recentAttempts": "So'nggi urinishlar",
+    "recentNote": "So'nggi {{count}} ta urinish, eskisidan boshlab",
+    "needsWork": "Takrorlash kerak"
+  },
+  "bank": {
+    "count_one": "{{count}} ta savol",
+    "count_other": "{{count}} ta savol",
+    "searchPlaceholder": "Savollardan qidirish...",
+    "hasImage": "Rasm bor",
+    "filter": {
+      "all": "Barchasi",
+      "weak": "Xatolar",
+      "mastered": "O'zlashtirilgan",
+      "unseen": "Ko'rilmagan",
+      "image": "Rasmli"
+    }
+  },
+  "settings": {
+    "data": "Ma'lumotlar",
+    "savedLocally": "Shu qurilmada saqlangan",
+    "attemptsOnDevice_one": "{{count}} ta urinish",
+    "attemptsOnDevice_other": "{{count}} ta urinish",
+    "storageOk": "Ishlayapti",
+    "storageUnavailable": "Ishlamayapti",
+    "storageBlocked": "Xotira bloklangan - natijalar sahifa yangilanganda saqlanmaydi. Odatda bunga maxfiy rejim yoki bloklangan sayt ma'lumotlari sabab bo'ladi.",
+    "resetTitle": "Barcha natijalarni o'chirasizmi?",
+    "resetBody": "Shu qurilmadagi barcha javoblar, urinishlar va ketma-ketliklar o'chiriladi. Buni qaytarib bo'lmaydi.",
+    "reset": "Barcha natijalarni o'chirish",
+    "resetDone": "Natijalar o'chirildi"
+  },
+  "media": {
+    "enlarge": "Rasmni kattalashtirish"
+  },
+  "install": {
+    "title": "Ilovani o'rnating",
+    "body": "Internetsiz ishlaydi, telefoningizdan tez ochiladi",
+    "action": "O'rnatish",
+    "iosTitle": "Bosh ekranga qo'shish",
+    "iosBody": "Safari ilovani quyidagicha o'rnatadi:",
+    "iosStep1": "Pastdagi “Ulashish” tugmasini bosing",
+    "iosStep2": "“Bosh ekranga qo'shish” ni tanlang",
+    "offlineReady": "Ilova internetsiz ishlashga tayyor",
+    "updateTitle": "Yangi versiya mavjud",
+    "updateBody": "Yangilash uchun sahifa qayta yuklanadi",
+    "updateAction": "Yangilash"
+  }
+}

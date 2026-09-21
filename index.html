@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>MDEV-Avtotest</title>
+    <meta
+      name="description"
+      content="Yo'l harakati qoidalari imtihoniga tayyorgarlik. 1353 ta savol, 4 tilda, offline ishlaydi."
+    />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="MDEV-Avtotest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+
+    <script>
+      // The browser can fire beforeinstallprompt before React has mounted its
+      // listener, and the event is only offered once - miss it and the install
+      // card never appears. Catch it here and hand it over when React is ready.
+      window.__installPrompt = null
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault()
+        window.__installPrompt = e
+        window.dispatchEvent(new Event('installpromptready'))
+      })
+    </script>
+
+    <script>
+      // apply the stored theme before first paint so there's no light flash
+      try {
+        var t = localStorage.getItem('eavtomaktab:theme') || 'system'
+        var dark =
+          t === 'dark' ||
+          (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        if (dark) document.documentElement.classList.add('dark')
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

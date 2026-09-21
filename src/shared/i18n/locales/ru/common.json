@@ -1,0 +1,164 @@
+{
+  "app": {
+    "name": "MDEV-Avtotest",
+    "tagline": "Подготовка к экзамену по правилам дорожного движения"
+  },
+  "nav": {
+    "home": "Главная",
+    "tests": "Тесты",
+    "bank": "Вопросы",
+    "stats": "Статистика",
+    "settings": "Настройки"
+  },
+  "action": {
+    "start": "Начать",
+    "next": "Далее",
+    "prev": "Назад",
+    "finish": "Завершить",
+    "retry": "Повторить",
+    "continue": "Продолжить",
+    "cancel": "Отмена",
+    "close": "Закрыть",
+    "save": "Сохранить",
+    "discard": "Удалить",
+    "drill": "Тренировать"
+  },
+  "state": {
+    "loading": "Загрузка...",
+    "error": "Произошла ошибка",
+    "empty": "Ничего не найдено",
+    "errorBank": "Не удалось загрузить базу вопросов"
+  },
+  "theme": {
+    "label": "Тема",
+    "light": "Светлая",
+    "dark": "Тёмная",
+    "system": "Системная"
+  },
+  "language": {
+    "label": "Язык"
+  },
+  "home": {
+    "unfinished": "Незавершённый тест",
+    "answeredOf": "Отвечено {{count}} из {{total}}",
+    "today": "Сегодня",
+    "questionsAnswered": "вопросов отвечено",
+    "streak": "Серия",
+    "daysInRow_one": "день подряд",
+    "daysInRow_few": "дня подряд",
+    "daysInRow_many": "дней подряд",
+    "daysInRow_other": "дней подряд",
+    "tests20": "Тесты по 20 вопросов",
+    "tests10": "Тесты по 10 вопросов",
+    "testsMeta": "{{count}} тестов · {{minutes}} мин",
+    "exam": "Экзамен",
+    "examMeta": "{{count}} случайных вопросов · {{minutes}} мин · максимум {{mistakes}} ошибки",
+    "practice": "Работа над ошибками",
+    "practiceMeta": "{{count}} вопросов требуют повторения",
+    "coverage": "Охват базы"
+  },
+  "tests": {
+    "meta": "{{count}} вопросов · {{minutes}} мин · мгновенная проверка",
+    "tab20": "20 вопросов",
+    "tab10": "10 вопросов"
+  },
+  "test": {
+    "question": "Вопрос",
+    "of": "из",
+    "correct": "Правильный ответ",
+    "incorrect": "Ваш ответ",
+    "score": "Результат",
+    "timeLeft": "Осталось времени",
+    "mistakes": "{{count}}/{{max}} ошибок",
+    "flag": "Отметить",
+    "leaveTitle": "Выйти из теста?",
+    "leaveBody": "Ответы сохранятся - вы продолжите с того же места, а таймер приостановится.",
+    "submitTitle": "Завершить тест?",
+    "submitAllAnswered": "На все вопросы даны ответы.",
+    "submitUnanswered_one": "{{count}} вопрос без ответа. Он засчитывается как ошибка.",
+    "submitUnanswered_few": "{{count}} вопроса без ответа. Они засчитываются как ошибки.",
+    "submitUnanswered_many": "{{count}} вопросов без ответа. Они засчитываются как ошибки.",
+    "submitUnanswered_other": "{{count}} вопросов без ответа. Они засчитываются как ошибки."
+  },
+  "results": {
+    "passed": "СДАНО",
+    "failed": "НЕ СДАНО",
+    "meta": "{{wrong}} ошибок · затрачено {{time}}",
+    "maxAllowed": "максимум {{count}} допускается",
+    "review": "Разбор",
+    "tabWrong": "Ошибки ({{count}})",
+    "tabAll": "Все ({{count}})",
+    "leftBlank": "Без ответа",
+    "drillMistakes": "Тренировать ошибки"
+  },
+  "stats": {
+    "currentStreak": "Текущая серия",
+    "longestStreak": "Лучшая серия",
+    "accuracy": "Точность",
+    "timeStudied": "Время занятий",
+    "days_one": "день",
+    "days_few": "дня",
+    "days_many": "дней",
+    "days_other": "дней",
+    "activity": "Активность",
+    "answeredLastYear": "вопросов отвечено за последний год",
+    "noActivity": "Нет активности",
+    "dayDetail": "{{count}} отвечено · {{percent}}% верно",
+    "less": "Меньше",
+    "more": "Больше",
+    "coverage": "Охват базы",
+    "mastered": "Освоено",
+    "learning": "В процессе",
+    "unseen": "Не изучено",
+    "masteryNote": "Освоено = {{count}} правильных ответа подряд.",
+    "recentAttempts": "Последние попытки",
+    "recentNote": "Последние {{count}} попыток, от старых к новым",
+    "needsWork": "Требует внимания"
+  },
+  "bank": {
+    "count_one": "{{count}} вопрос",
+    "count_few": "{{count}} вопроса",
+    "count_many": "{{count}} вопросов",
+    "count_other": "{{count}} вопросов",
+    "searchPlaceholder": "Поиск по вопросам...",
+    "hasImage": "С изображением",
+    "filter": {
+      "all": "Все",
+      "weak": "Ошибки",
+      "mastered": "Освоено",
+      "unseen": "Не изучено",
+      "image": "С картинкой"
+    }
+  },
+  "settings": {
+    "data": "Данные",
+    "savedLocally": "Сохранено на устройстве",
+    "attemptsOnDevice_one": "{{count}} попытка",
+    "attemptsOnDevice_few": "{{count}} попытки",
+    "attemptsOnDevice_many": "{{count}} попыток",
+    "attemptsOnDevice_other": "{{count}} попыток",
+    "storageOk": "Работает",
+    "storageUnavailable": "Недоступно",
+    "storageBlocked": "Хранилище заблокировано - прогресс не сохранится после перезагрузки. Обычно причина в приватном режиме или запрете данных сайта.",
+    "resetTitle": "Сбросить весь прогресс?",
+    "resetBody": "Удалит все ответы, попытки и серии на этом устройстве. Действие необратимо.",
+    "reset": "Сбросить весь прогресс",
+    "resetDone": "Прогресс сброшен"
+  },
+  "media": {
+    "enlarge": "Увеличить изображение"
+  },
+  "install": {
+    "title": "Установите приложение",
+    "body": "Работает без интернета, быстро открывается с телефона",
+    "action": "Установить",
+    "iosTitle": "Добавить на главный экран",
+    "iosBody": "Safari устанавливает приложение так:",
+    "iosStep1": "Нажмите кнопку “Поделиться” внизу",
+    "iosStep2": "Выберите “На экран «Домой»”",
+    "offlineReady": "Приложение готово к работе без интернета",
+    "updateTitle": "Доступна новая версия",
+    "updateBody": "Страница перезагрузится для обновления",
+    "updateAction": "Обновить"
+  }
+}

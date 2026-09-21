@@ -1,0 +1,42 @@
+.DS_Store
+node_modules/
+dist/
+.env
+.env.local
+
+# 156 MB of original question images - keep out of git, serve from R2.
+# Rebuild any time with: python3 scripts/download_images.py
+scrapes/images/
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# generated from scrapes - rebuild with: npm run data
+/public/data/

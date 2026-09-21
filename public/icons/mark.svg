@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f8ef7"/>
+      <stop offset="1" stop-color="#2050c8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="114" fill="url(#bg)"/>
+
+  <!-- road in perspective: wide at the bottom, narrowing to a vanishing point -->
+  <path d="M150 400 L214 150 L298 150 L362 400 Z" fill="#fff" opacity="0.97"/>
+
+  <!-- centre line dashes, sized so the lowest one still reads at 32px -->
+  <g fill="#2050c8">
+    <rect x="244" y="163" width="24" height="34" rx="12"/>
+    <rect x="240" y="223" width="32" height="46" rx="16"/>
+    <rect x="234" y="296" width="44" height="62" rx="22"/>
+  </g>
+</svg>
