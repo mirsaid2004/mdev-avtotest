@@ -26,6 +26,12 @@ export const TIMER_DANGER_MS = 60 * 1000
 /** Consecutive correct answers before a question is considered mastered. */
 export const MASTERY_STREAK = 3
 
+/**
+ * How long a correct answer stays on screen before the next question slides in.
+ * Long enough to register the green, short enough not to feel like waiting.
+ */
+export const AUTO_ADVANCE_MS = 700
+
 /** Questions per practice drill. */
 export const PRACTICE_SIZE = 20
 

@@ -8,20 +8,19 @@ import { useRegisterSW } from 'virtual:pwa-register/react'
  *
  * registerType is 'prompt', not 'autoUpdate': swapping the app out from under
  * someone mid-exam would lose their session. They choose when.
+ *
+ * There is no "ready to work offline" toast here on purpose. Only the app
+ * shell, bundle and question bank are precached - images are cached only as
+ * they're actually viewed, so "ready for offline" would overclaim exactly the
+ * gap users hit first: a test page or an uncached image before it's ever been
+ * seen online. Silence is more honest than a banner that oversells it.
  */
 export function UpdatePrompt() {
   const { t } = useTranslation()
   const {
     needRefresh: [needRefresh, setNeedRefresh],
-    offlineReady: [offlineReady, setOfflineReady],
     updateServiceWorker,
   } = useRegisterSW()
-
-  useEffect(() => {
-    if (!offlineReady) return
-    toast.success(t('install.offlineReady'), { duration: 4000 })
-    setOfflineReady(false)
-  }, [offlineReady, setOfflineReady, t])
 
   useEffect(() => {
     if (!needRefresh) return

@@ -27,7 +27,8 @@
     "loading": "Yuklanmoqda...",
     "error": "Xatolik yuz berdi",
     "empty": "Hech narsa topilmadi",
-    "errorBank": "Savollar bazasini yuklab bo'lmadi"
+    "errorBank": "Savollar bazasini yuklab bo'lmadi",
+    "errorTests": "Testlar ro'yxatini yuklab bo'lmadi"
   },
   "theme": {
     "label": "Mavzu",
@@ -74,7 +75,16 @@
     "submitTitle": "Testni yakunlaysizmi?",
     "submitAllAnswered": "Barcha savollarga javob berilgan.",
     "submitUnanswered_one": "{{count}} ta savol javobsiz qoldi. Javobsiz savol xato hisoblanadi.",
-    "submitUnanswered_other": "{{count}} ta savol javobsiz qoldi. Javobsiz savollar xato hisoblanadi."
+    "submitUnanswered_other": "{{count}} ta savol javobsiz qoldi. Javobsiz savollar xato hisoblanadi.",
+    "pause": "Vaqtni to'xtatish",
+    "resume": "Davom ettirish",
+    "replay": "Qaytadan",
+    "completeTitle": "Barcha savollarga javob berildi",
+    "completeBody": "Natijangiz quyidagicha. Qaytadan ishlashingiz yoki yakunlashingiz mumkin.",
+    "completeExamPass": "Siz imtihondan o'tdingiz - {{max}} tadan ko'p bo'lmagan xato.",
+    "completeExamFail": "Xatolar soni {{max}} tadan oshdi - imtihon topshirilmadi.",
+    "correctCount": "To'g'ri javoblar",
+    "wrongCount": "Xatolar"
   },
   "results": {
     "passed": "O'TDINGIZ",
@@ -136,7 +146,9 @@
     "resetDone": "Natijalar o'chirildi"
   },
   "media": {
-    "enlarge": "Rasmni kattalashtirish"
+    "enlarge": "Rasmni kattalashtirish",
+    "failed": "Rasm yuklanmadi",
+    "offlineUnavailable": "Bu rasm hali oflayn uchun saqlanmagan"
   },
   "install": {
     "title": "Ilovani o'rnating",

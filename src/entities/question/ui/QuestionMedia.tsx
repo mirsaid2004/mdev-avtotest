@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Expand, X } from 'lucide-react'
+import { Expand, ImageOff, X } from 'lucide-react'
 import { imageUrl } from '@/shared/config'
-import { cn } from '@/shared/lib'
+import { cn, useOnlineStatus } from '@/shared/lib'
 
 /**
  * Question image, tappable to fullscreen.
@@ -13,12 +13,51 @@ import { cn } from '@/shared/lib'
  */
 export function QuestionMedia({ media, alt }: { media: string | null; alt: string }) {
   const { t } = useTranslation()
+  const online = useOnlineStatus()
   const [open, setOpen] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)
+  // bumped on retry to force a fresh network attempt rather than whatever the
+  // browser remembers about the last failed request for this exact URL
+  const [attempt, setAttempt] = useState(0)
 
   const src = imageUrl(media)
-  if (!src || failed) return null
+  if (!src) return null
+
+  const retry = () => {
+    setFailed(false)
+    setLoaded(false)
+    setAttempt((a) => a + 1)
+  }
+
+  /*
+   * 801 of 1353 questions have an image, and only images already viewed while
+   * online are cached for offline use (the full set is 156 MB - too much to
+   * ship in the precache). A failed load used to just make this component
+   * return null, which reads as "the app is broken" rather than "this
+   * particular image isn't available right now" - so it gets an honest
+   * placeholder instead, matching the space the image would have used.
+   */
+  if (failed) {
+    return (
+      <div
+        data-testid="question-media-unavailable"
+        className="flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed bg-muted text-center text-muted-foreground"
+      >
+        <ImageOff className="size-6" />
+        <p className="max-w-[80%] text-xs">
+          {online ? t('media.failed') : t('media.offlineUnavailable')}
+        </p>
+        <button
+          type="button"
+          onClick={retry}
+          className="text-xs font-medium text-primary underline-offset-2 hover:underline"
+        >
+          {t('action.retry')}
+        </button>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -34,7 +73,8 @@ export function QuestionMedia({ media, alt }: { media: string | null; alt: strin
       >
         <div className="aspect-video w-full">
           <img
-            src={src}
+            key={attempt}
+            src={attempt ? `${src}?retry=${attempt}` : src}
             alt={alt}
             loading="eager"
             decoding="async"

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { EXAM, isExamPass, type TestMode } from '@/shared/config'
+import { AUTO_ADVANCE_MS, EXAM, isExamPass, type TestMode } from '@/shared/config'
 import { useProgress, type ActiveSession, type AttemptRecord } from '@/entities/progress'
 import type { Question } from '@/entities/question'
 
@@ -22,6 +22,8 @@ export interface TestSessionState {
   answeredCount: number
   wrongCount: number
   remainingMs: number
+  paused: boolean
+  canPause: boolean
   expired: boolean
   submitted: boolean
   result: AttemptRecord | null
@@ -67,7 +69,12 @@ export function useTestSession({
   const [remainingMs, setRemainingMs] = useState(
     durationMs > 0 ? resume?.remainingMs || durationMs : 0,
   )
+  // training and practice may pause the clock; an exam may not, or the limit
+  // means nothing
+  const canPause = mode !== 'exam' && durationMs > 0
+  const [paused, setPaused] = useState(false)
   const questionShownAt = useRef(Date.now())
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // persist() needs current values without being re-created on every change
   const answersRef = useRef(answers)
@@ -125,7 +132,7 @@ export function useTestSession({
   // --- clock --------------------------------------------------------------
 
   useEffect(() => {
-    if (durationMs <= 0 || submitted) return
+    if (durationMs <= 0 || submitted || paused) return
     const tick = () => {
       const left = Math.max(0, deadline.current - Date.now())
       setRemainingMs(left)
@@ -134,7 +141,19 @@ export function useTestSession({
     tick()
     const id = setInterval(tick, 250)
     return () => clearInterval(id)
-  }, [durationMs, submitted, submit])
+  }, [durationMs, submitted, paused, submit])
+
+  /**
+   * Pausing freezes the clock by dropping the interval; resuming rebuilds the
+   * deadline from whatever was left, so the time spent paused is not counted.
+   */
+  const togglePause = useCallback(() => {
+    if (!canPause) return
+    setPaused((was) => {
+      if (was) deadline.current = Date.now() + remainingRef.current
+      return !was
+    })
+  }, [canPause])
 
   // --- persistence --------------------------------------------------------
 
@@ -192,18 +211,43 @@ export function useTestSession({
       setAnswers(nextAnswers)
       recordAnswer(question.id, correct, seconds)
       persist({ answers: nextAnswers })
+
+      // Right answer: move on by itself after a beat long enough to register
+      // the green. Wrong answer: stay put - that is the moment worth reading.
+      if (correct && indexRef.current < questions.length - 1) {
+        if (advanceTimer.current) clearTimeout(advanceTimer.current)
+        advanceTimer.current = setTimeout(() => {
+          questionShownAt.current = Date.now()
+          setIndex((i) => {
+            const next = Math.min(i + 1, questions.length - 1)
+            persist({ index: next })
+            return next
+          })
+        }, AUTO_ADVANCE_MS)
+      }
     },
-    [question, submitted, revealAnswers, answers, recordAnswer, persist],
+    [question, submitted, revealAnswers, answers, recordAnswer, persist, questions.length],
   )
+
+  const cancelAutoAdvance = useCallback(() => {
+    if (advanceTimer.current) {
+      clearTimeout(advanceTimer.current)
+      advanceTimer.current = null
+    }
+  }, [])
+
+  // never let a queued jump fire after unmount
+  useEffect(() => cancelAutoAdvance, [cancelAutoAdvance])
 
   const goto = useCallback(
     (next: number) => {
       if (next < 0 || next >= questions.length) return
+      cancelAutoAdvance()
       questionShownAt.current = Date.now()
       setIndex(next)
       persist({ index: next })
     },
-    [questions.length, persist],
+    [questions.length, persist, cancelAutoAdvance],
   )
 
   const next = useCallback(() => goto(index + 1), [goto, index])
@@ -218,7 +262,28 @@ export function useTestSession({
     persist({ flagged: [...copy] })
   }, [question, persist])
 
-  const abandon = useCallback(() => setActiveSession(null), [setActiveSession])
+  /** Wipes the attempt and starts the same question set over. */
+  const restart = useCallback(() => {
+    cancelAutoAdvance()
+    setAnswers({})
+    setFlagged(new Set())
+    setIndex(0)
+    setSubmitted(false)
+    setResult(null)
+    startedAt.current = Date.now()
+    questionShownAt.current = Date.now()
+    if (durationMs > 0) {
+      deadline.current = Date.now() + durationMs
+      setRemainingMs(durationMs)
+    }
+    setPaused(false)
+    persist({ answers: {}, flagged: [], index: 0 })
+  }, [cancelAutoAdvance, durationMs, persist])
+
+  const abandon = useCallback(() => {
+    cancelAutoAdvance()
+    setActiveSession(null)
+  }, [setActiveSession, cancelAutoAdvance])
 
   const state: TestSessionState = {
     index,
@@ -229,6 +294,8 @@ export function useTestSession({
     answeredCount,
     wrongCount,
     remainingMs,
+    paused,
+    canPause,
     expired: durationMs > 0 && remainingMs === 0,
     submitted,
     result,
@@ -241,6 +308,9 @@ export function useTestSession({
     examFailed: mode === 'exam' && wrongCount > EXAM.maxMistakes,
     select,
     goto,
+    togglePause,
+    cancelAutoAdvance,
+    restart,
     next,
     prev,
     toggleFlag,

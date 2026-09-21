@@ -1,17 +1,26 @@
-import { lazy } from 'react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import { AppLayout } from '@/widgets/app-layout'
+import { HomePage } from '@/pages/home'
+import { TestsPage } from '@/pages/tests'
+import { TestPage } from '@/pages/test'
+import { ResultsPage } from '@/pages/results'
+import { BankPage } from '@/pages/bank'
+import { StatsPage } from '@/pages/stats'
+import { SettingsPage } from '@/pages/settings'
+import { NotFoundPage } from '@/pages/not-found'
 import { ROUTES } from './routes'
 
-const HomePage = lazy(() => import('@/pages/home'))
-const TestsPage = lazy(() => import('@/pages/tests'))
-const TestPage = lazy(() => import('@/pages/test'))
-const ResultsPage = lazy(() => import('@/pages/results'))
-const BankPage = lazy(() => import('@/pages/bank'))
-const StatsPage = lazy(() => import('@/pages/stats'))
-const SettingsPage = lazy(() => import('@/pages/settings'))
-const NotFoundPage = lazy(() => import('@/pages/not-found'))
-
+/**
+ * Pages are statically imported, not React.lazy(). This is a small app
+ * (~265 KB gzip for everything), and the whole point of the PWA is reliable
+ * offline use - React.lazy()'s dynamic import() has to be served from the
+ * service worker's cache at the exact moment a route is first visited, and
+ * WebKit specifically can fail that ("Importing a module script failed"),
+ * crashing to React Router's default error screen for anyone offline who
+ * taps into a page they haven't opened yet this session. Bundling everything
+ * up front costs a little on first load - which is precached anyway - and
+ * removes that failure mode completely, on every browser, permanently.
+ */
 const router = createBrowserRouter([
   // the solver sits outside AppLayout: it owns the whole screen, and a tab bar
   // during a timed exam is an invitation to lose your progress

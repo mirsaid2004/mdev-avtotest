@@ -22,7 +22,7 @@ extra setup step.
 ```sh
 npm run build        # generate data -> typecheck -> bundle
 npm run preview      # serve the production build
-npm test             # 94 e2e tests x 3 devices = 282 runs
+npm test             # 115 e2e tests x 3 devices
 ```
 
 ## Scripts
@@ -134,6 +134,16 @@ Two rules worth keeping:
 with 2 mistakes allowed, 12 minutes for a 10-question test, mastery at 3 correct
 in a row.
 
+### Offline data fetching
+
+TanStack Query's default `networkMode: 'online'` pauses a query indefinitely
+once the browser has fired an `offline` event this session - useful for a
+live API, wrong for us: every fetch here is answered by the service worker's
+own cache regardless of connectivity, so nothing should ever be gated on
+`navigator.onLine`. `networkMode: 'always'` is set globally instead, so a
+route opened for the first time while offline still reaches the cache instead
+of sitting in `fetchStatus: 'paused'` forever with the skeleton on screen.
+
 ### Progress storage
 
 `localStorage`, not IndexedDB. A fully-worked bank plus a year of daily activity
@@ -155,6 +165,34 @@ The blob is versioned; v1 migrates to v2 rather than being discarded.
 - **Answers lock once given.** Every mode reveals the correct answer immediately,
   exam included. Being able to change your mind after seeing it would make every
   statistic meaningless.
+- **A correct answer advances on its own** after 700 ms, long enough to register
+  the green. A wrong one stays put — that is the moment worth reading.
+- **The resolved question set is pinned once per test**, not recomputed on every
+  render. `exam` and `practice` pick their questions with `sample()`, and one of
+  their dependencies (`weakIds`) legitimately changes after every answer — so
+  without pinning, giving any answer would silently re-randomise the whole test
+  out from under whatever was on screen. Caught because it looked exactly like
+  clicks "doing nothing": the answer registered, then the question array was
+  replaced a moment later.
+- **The question strip is a Swiper**: swipe on touch, mouse wheel on desktop
+  (released to the page at either end), plus scroll buttons when it overflows.
+- **Finishing every question opens a summary** with the tally and a choice of
+  replaying the same test or submitting. It does not submit by itself, so the
+  test stays open for review if dismissed.
+- **Training and practice can pause the clock** by tapping the timer. Paused time
+  is not deducted. Exam cannot — a pausable limit is not a limit.
+- **Pages are one bundle, not code-split.** `React.lazy()`'s dynamic `import()`
+  has to be served from the service worker's cache the moment a route is first
+  opened, and WebKit can fail that ("Importing a module script failed"),
+  crashing to a raw error screen for anyone offline who taps into a page they
+  haven't opened yet this session. The whole app is ~265 KB gzip, small enough
+  that bundling it as one chunk removes the failure mode entirely, on every
+  browser, rather than working around it.
+- **No blanket "ready for offline" toast.** Only the shell and question bank are
+  precached; images cache as they're actually viewed. Claiming full offline
+  readiness on install would oversell exactly the gap a user hits first.
+- **An uncached image says so** instead of vanishing — a placeholder with a
+  retry button, not a blank space that reads as a bug.
 - **The clock pauses while you are away.** Remaining time is persisted and the
   deadline rebuilt on resume, so a phone call does not fail your exam.
 - **Unanswered counts as wrong**, and the submit dialog says so.
@@ -207,7 +245,11 @@ parse error rather than a missing file. `e2e/deploy.spec.ts` fails the suite if
 
 ## Tests
 
-94 tests, each run against Desktop Chrome, Pixel 7 and iPhone 13 — 282 runs.
+115 tests, each run against Desktop Chrome, Pixel 7 and iPhone 13. A handful
+are skipped on WebKit specifically where headless WebKit's own offline
+emulation breaks service worker cache lookups - a documented Playwright/WebKit
+harness limitation, not something demonstrated on a real device; offline is
+verified on Chromium and Android Chrome.
 
 | File | Covers |
 | --- | --- |
@@ -217,6 +259,7 @@ parse error rather than a missing file. `e2e/deploy.spec.ts` fails the suite if
 | `bank.spec.ts` | Virtualisation, search, filters, i18n across all languages |
 | `heatmap.spec.ts` | Today's cell, intensity scale, scroll position, streaks |
 | `pwa.spec.ts` | Manifest, service worker, offline, install card, logo |
+| `interactions.spec.ts` | Auto-advance, Swiper strip, completion summary, timer pause |
 | `deploy.spec.ts` | `dist/` contents, Netlify config, graceful failure when the bank is missing |
 | `theme.spec.ts` | Light/dark, stored preference, no flash before paint |
 | `responsive.spec.ts` | No horizontal overflow at 320/390/768/1440px |

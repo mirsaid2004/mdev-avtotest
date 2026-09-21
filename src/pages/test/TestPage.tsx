@@ -44,29 +44,53 @@ export function TestPage() {
   }
   const resume = resumeRef.current.session
 
+  /**
+   * The resolved question set, pinned once per testId.
+   *
+   * `weakIds` legitimately changes after every single answer - that's the
+   * point, it tracks what still needs work. But `exam` and `practice` call
+   * sample() during resolution, so recomputing on every answer silently
+   * re-randomises the whole question set out from under whichever question
+   * is on screen: an answer would register, the array would be replaced a
+   * moment later, and the next click would land on a different question than
+   * the one just rendered - which looked exactly like clicks doing nothing.
+   * Same fix as `resume` above: derive once per testId, not on every render.
+   */
+  const resolvedRef = useRef<{
+    testId: string
+    result: { questions: Question[]; title: string; size: 10 | 20 }
+  } | null>(null)
+
   const { questions, title, size } = useMemo(() => {
     const map = questionsQuery.map
     if (map.size === 0) return { questions: [] as Question[], title: '', size: 20 as const }
 
+    if (resolvedRef.current?.testId === testId) return resolvedRef.current.result
+
     const resolve = (ids: number[]) =>
       ids.map((id) => map.get(id)).filter((q): q is Question => Boolean(q))
 
+    const pin = (result: { questions: Question[]; title: string; size: 10 | 20 }) => {
+      resolvedRef.current = { testId, result }
+      return result
+    }
+
     // resuming keeps the exact question set, so a random exam stays the same exam
     if (resume) {
-      return {
+      return pin({
         questions: resolve(resume.questionIds),
         title: titleFor(testId, resume.questionIds.length),
-        size: (resume.questionIds.length > 10 ? 20 : 10) as 10 | 20,
-      }
+        size: resume.questionIds.length > 10 ? 20 : 10,
+      })
     }
 
     if (testId === 'exam') {
       const all = [...map.values()]
-      return {
+      return pin({
         questions: sample(all, EXAM.questionCount),
         title: 'Examination',
-        size: 20 as const,
-      }
+        size: 20,
+      })
     }
 
     if (testId === 'practice') {
@@ -79,16 +103,18 @@ export function TestPage() {
               PRACTICE_SIZE - weak.length,
             )
           : []
-      return { questions: [...weak, ...filler], title: 'Practice', size: 20 as const }
+      return pin({ questions: [...weak, ...filler], title: 'Practice', size: 20 })
     }
 
     const template = testsQuery.data?.find((x) => x.id === testId)
+    // not pinned: the template list may still be arriving, so keep retrying
+    // until it either resolves or genuinely doesn't exist
     if (!template) return { questions: [] as Question[], title: '', size: 20 as const }
-    return {
+    return pin({
       questions: resolve(template.questionIds),
       title: `${template.size}-question test #${template.number}`,
       size: template.size,
-    }
+    })
   }, [questionsQuery.map, testsQuery.data, testId, resume, weakIds])
 
   if (questionsQuery.isPending || testsQuery.isPending) {

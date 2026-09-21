@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight, Flag, X } from 'lucide-react'
@@ -19,6 +19,7 @@ import { useTestSession } from '@/features/test-session'
 import type { ActiveSession } from '@/entities/progress'
 import { ROUTES } from '@/app/router/routes'
 import { TimerDisplay } from './TimerDisplay'
+import { CompletionDialog } from './CompletionDialog'
 import { QuestionSlider } from './QuestionSlider'
 
 interface Props {
@@ -35,6 +36,9 @@ export function TestSolver({ testId, title, mode, questions, durationMs, resume 
   const navigate = useNavigate()
   const [confirmExit, setConfirmExit] = useState(false)
   const [confirmSubmit, setConfirmSubmit] = useState(false)
+  const [showCompletion, setShowCompletion] = useState(false)
+  // so dismissing the summary doesn't make it pop straight back
+  const completionSeen = useRef(false)
 
   const session = useTestSession({ testId, mode, questions, durationMs, resume })
   const { question, index, total, answers, flagged } = session
@@ -45,6 +49,17 @@ export function TestSolver({ testId, title, mode, questions, durationMs, resume 
   useEffect(() => {
     if (resultId) navigate(ROUTES.results(resultId), { replace: true })
   }, [resultId, navigate])
+
+  // every question answered: offer the summary once, without submitting - the
+  // user may still want to scroll back through what they got wrong
+  const allAnswered = session.answeredCount === total
+  useEffect(() => {
+    if (allAnswered && !completionSeen.current && !session.submitted) {
+      completionSeen.current = true
+      const id = setTimeout(() => setShowCompletion(true), 500)
+      return () => clearTimeout(id)
+    }
+  }, [allAnswered, session.submitted])
 
   if (!question) return null
 
@@ -88,7 +103,14 @@ export function TestSolver({ testId, title, mode, questions, durationMs, resume 
             </p>
           </div>
 
-          {durationMs > 0 && <TimerDisplay remainingMs={session.remainingMs} />}
+          {durationMs > 0 && (
+            <TimerDisplay
+              remainingMs={session.remainingMs}
+              paused={session.paused}
+              canPause={session.canPause}
+              onTogglePause={session.togglePause}
+            />
+          )}
         </div>
 
         <Progress value={((index + 1) / total) * 100} className="h-0.5 rounded-none" />
@@ -141,7 +163,7 @@ export function TestSolver({ testId, title, mode, questions, durationMs, resume 
             <Flag className="size-4" />
           </Button>
 
-          {isLast ? (
+          {isLast || allAnswered ? (
             <Button className="flex-1" onClick={() => setConfirmSubmit(true)}>
               {t('action.finish')}
             </Button>
@@ -153,6 +175,24 @@ export function TestSolver({ testId, title, mode, questions, durationMs, resume 
           )}
         </div>
       </footer>
+
+      <CompletionDialog
+        open={showCompletion}
+        onOpenChange={setShowCompletion}
+        total={total}
+        correct={total - session.wrongCount}
+        wrong={session.wrongCount}
+        isExam={mode === 'exam'}
+        onReplay={() => {
+          setShowCompletion(false)
+          completionSeen.current = false
+          session.restart()
+        }}
+        onComplete={() => {
+          setShowCompletion(false)
+          session.submit()
+        }}
+      />
 
       {/* leaving mid-test */}
       <Dialog open={confirmExit} onOpenChange={setConfirmExit}>

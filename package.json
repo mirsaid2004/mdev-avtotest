@@ -33,6 +33,7 @@
     "react-i18next": "^17.0.14",
     "react-router-dom": "^7.18.4",
     "sonner": "^2.0.8",
+    "swiper": "^14.2.0",
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
