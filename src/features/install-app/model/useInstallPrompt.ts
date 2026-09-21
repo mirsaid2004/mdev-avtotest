@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 
-const DISMISSED_KEY = 'eavtomaktab:install-dismissed'
-
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
@@ -33,21 +31,14 @@ function isIOS(): boolean {
   )
 }
 
-function wasDismissed(): boolean {
-  try {
-    return localStorage.getItem(DISMISSED_KEY) === '1'
-  } catch {
-    return false
-  }
-}
-
 /**
  * Drives the install card.
  *
  * Chromium fires `beforeinstallprompt` and lets us trigger the native dialog.
  * iOS Safari does neither - it can install, but only through the share sheet -
  * so there we detect the platform and show instructions instead. Anything
- * already installed, or dismissed once, shows nothing.
+ * already installed, or dismissed, shows nothing - dismissal only lasts for
+ * the current page load and resets on refresh.
  */
 export function useInstallPrompt() {
   // the event may already have fired before React mounted, in which case the
@@ -56,7 +47,7 @@ export function useInstallPrompt() {
     () => (typeof window === 'undefined' ? null : window.__installPrompt),
   )
   const [installed, setInstalled] = useState(isStandalone)
-  const [dismissed, setDismissed] = useState(wasDismissed)
+  const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
     const onPrompt = (e: Event) => {
@@ -98,11 +89,6 @@ export function useInstallPrompt() {
 
   const dismiss = useCallback(() => {
     setDismissed(true)
-    try {
-      localStorage.setItem(DISMISSED_KEY, '1')
-    } catch {
-      /* it just won't be remembered */
-    }
   }, [])
 
   const ios = isIOS()
