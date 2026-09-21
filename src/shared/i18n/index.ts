@@ -6,7 +6,6 @@ import { DEFAULT_LANGUAGE, LANGUAGE_CODES } from '@/shared/config'
 import uzb from './locales/uzb/common.json'
 import uzc from './locales/uzc/common.json'
 import ru from './locales/ru/common.json'
-import kaa from './locales/kaa/common.json'
 
 export const LANGUAGE_STORAGE_KEY = 'eavtomaktab:lang'
 
@@ -23,7 +22,6 @@ void i18n
       uzb: { common: uzb },
       uzc: { common: uzc },
       ru: { common: ru },
-      kaa: { common: kaa },
     },
     defaultNS: 'common',
     fallbackLng: DEFAULT_LANGUAGE,

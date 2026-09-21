@@ -20,7 +20,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRAPES = os.path.join(ROOT, "scrapes")
 OUT = os.path.join(ROOT, "public", "data")
 
-LANGS = ("uzb", "uzc", "ru", "kaa")
+LANGS = ("uzb", "uzc", "ru")
 
 
 def basename(url):

@@ -5,17 +5,22 @@ test.describe('app shell', () => {
     await page.goto('/')
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 
-    await expect(page.getByRole('link', { name: /20-question tests/ })).toBeVisible()
-    await expect(page.getByRole('link', { name: /10-question tests/ })).toBeVisible()
-    await expect(page.getByRole('link', { name: /Examination/ })).toBeVisible()
+    await expect(page.getByRole('link', { name: /20 savolli testlar/ })).toBeVisible()
+    await expect(page.getByRole('link', { name: /10 savolli testlar/ })).toBeVisible()
+    await expect(page.getByRole('link', { name: /Imtihon/ })).toBeVisible()
 
     // exam rules stated up front
-    await expect(page.getByText(/20 random questions.*25 min.*max 2 mistakes/)).toBeVisible()
+    await expect(page.getByText(/20 ta tasodifiy savol.*25 daqiqa.*2 xato/)).toBeVisible()
   })
 
   test('serves the data files with the expected shape', async ({ request }) => {
     const questions = await request.get('/data/questions.json')
     expect(questions.ok()).toBeTruthy()
+
+    // A missing data file does not 404 cleanly on a SPA host - it falls through
+    // to the index.html rewrite and comes back as HTML, which is exactly how
+    // this broke in production. Assert the content type, not just the status.
+    expect(questions.headers()['content-type']).toContain('application/json')
     const bank = await questions.json()
     expect(bank).toHaveLength(1353)
 
@@ -26,6 +31,7 @@ test.describe('app shell', () => {
     }
 
     const tests = await request.get('/data/tests.json')
+    expect(tests.headers()['content-type']).toContain('application/json')
     const templates = await tests.json()
     expect(templates).toHaveLength(202)
     expect(templates.filter((t: { size: number }) => t.size === 20)).toHaveLength(68)
@@ -42,15 +48,15 @@ test.describe('app shell', () => {
     await page.goto('/')
     const nav = isMobile ? page.locator('nav').last() : page.locator('header nav')
 
-    await nav.getByRole('link', { name: /Testlar|Tests/ }).click()
+    await nav.getByRole('link', { name: 'Testlar' }).click()
     await expect(page).toHaveURL(/\/tests\/20/)
     await expect(page.getByRole('link', { name: '1', exact: true })).toBeVisible()
 
-    await nav.getByRole('link', { name: /Natijalar|Stats/ }).click()
+    await nav.getByRole('link', { name: 'Natijalar' }).click()
     await expect(page).toHaveURL(/\/stats/)
-    await expect(page.getByText(/questions answered in the last year/)).toBeVisible()
+    await expect(page.getByText(/javob berilgan savollar/)).toBeVisible()
 
-    await nav.getByRole('link', { name: /Sozlamalar|Settings/ }).click()
+    await nav.getByRole('link', { name: 'Sozlamalar' }).click()
     await expect(page).toHaveURL(/\/settings/)
   })
 

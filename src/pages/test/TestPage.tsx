@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { durationForMode, EXAM, PRACTICE_SIZE, type TestMode } from '@/shared/config'
@@ -7,7 +7,7 @@ import { Skeleton } from '@/shared/ui/skeleton'
 import { Alert, AlertDescription, AlertTitle } from '@/shared/ui/alert'
 import { useQuestionMap, type Question } from '@/entities/question'
 import { useTests } from '@/entities/test'
-import { useProgress } from '@/entities/progress'
+import { useProgress, type ActiveSession } from '@/entities/progress'
 import { TestSolver } from '@/widgets/test-solver'
 import { ROUTES } from '@/app/router/routes'
 
@@ -27,8 +27,22 @@ export function TestPage() {
 
   const mode: TestMode = testId === 'exam' ? 'exam' : testId === 'practice' ? 'practice' : 'training'
 
-  // a session for THIS test is resumable; one for another test is not
-  const resume = activeSession?.testId === testId ? activeSession : null
+  /**
+   * The session to resume from, captured once per testId.
+   *
+   * Deriving this straight from activeSession each render is a feedback loop:
+   * the solver persists -> activeSession gets a new identity -> `questions`
+   * recomputes -> the solver persists again, forever. Only the value at entry
+   * matters, so pin it and let the solver own the session from there.
+   */
+  const resumeRef = useRef<{ id: string; session: ActiveSession | null } | null>(null)
+  if (resumeRef.current?.id !== testId) {
+    resumeRef.current = {
+      id: testId,
+      session: activeSession?.testId === testId ? activeSession : null,
+    }
+  }
+  const resume = resumeRef.current.session
 
   const { questions, title, size } = useMemo(() => {
     const map = questionsQuery.map

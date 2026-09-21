@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { eachDayOfInterval, format, startOfWeek, subDays } from 'date-fns'
 import { cn } from '@/shared/lib'
@@ -8,14 +8,29 @@ import { dayKey, type DayActivity } from '@/entities/progress'
 const WEEKS = 53
 const LEVELS = 4
 
-/** Thresholds are on questions answered, not tests taken - practice counts. */
+/**
+ * Thresholds are on questions answered, not tests taken - practice counts.
+ *
+ * Calibrated to real sessions: a 10-question test is a solid day (3) and a
+ * 20-question one is a strong day (4). Any activity at all must be obviously
+ * visible, so even a single answer gets a clearly filled cell rather than a
+ * near-invisible tint.
+ */
 function levelFor(answered: number): number {
   if (answered === 0) return 0
-  if (answered < 10) return 1
-  if (answered < 25) return 2
-  if (answered < 50) return 3
+  if (answered < 5) return 1
+  if (answered < 10) return 2
+  if (answered < 20) return 3
   return 4
 }
+
+const LEVEL_CLASS = [
+  'bg-muted',
+  'bg-primary/40',
+  'bg-primary/60',
+  'bg-primary/80',
+  'bg-primary',
+] as const
 
 /**
  * GitHub-style contribution grid: 53 weeks of columns, Sunday-first rows.
@@ -23,6 +38,20 @@ function levelFor(answered: number): number {
  */
 export function ActivityHeatmap({ daily }: { daily: Record<string, DayActivity> }) {
   const { t } = useTranslation()
+  const todayKey = dayKey()
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  /**
+   * Start scrolled to the most recent week.
+   *
+   * The grid runs oldest-to-newest and is wider than the card, so left-aligned
+   * it opens on last September and today sits off the right edge - which reads
+   * as "my activity isn't showing up".
+   */
+  useEffect(() => {
+    const el = scrollRef.current
+    if (el) el.scrollLeft = el.scrollWidth
+  }, [])
   const { weeks, months, total } = useMemo(() => {
     const today = new Date()
     const start = startOfWeek(subDays(today, WEEKS * 7 - 1), { weekStartsOn: 0 })
@@ -59,7 +88,7 @@ export function ActivityHeatmap({ daily }: { daily: Record<string, DayActivity> 
         </p>
       </div>
 
-      <div className="overflow-x-auto pb-1 [scrollbar-width:thin]">
+      <div ref={scrollRef} className="overflow-x-auto pb-1 [scrollbar-width:thin]">
         <div className="inline-block min-w-full">
           {/* month labels */}
           <div className="relative mb-1 h-4" style={{ width: weeks.length * 14 }}>
@@ -88,13 +117,14 @@ export function ActivityHeatmap({ daily }: { daily: Record<string, DayActivity> 
                     <Tooltip key={di}>
                       <TooltipTrigger asChild>
                         <div
+                          data-testid={cell.key === todayKey ? 'heatmap-today' : undefined}
+                          data-level={level}
                           className={cn(
                             'size-[11px] rounded-[2px] transition-colors',
-                            level === 0 && 'bg-muted',
-                            level === 1 && 'bg-primary/25',
-                            level === 2 && 'bg-primary/50',
-                            level === 3 && 'bg-primary/75',
-                            level === 4 && 'bg-primary',
+                            LEVEL_CLASS[level],
+                            // today is findable in a grid of 371 squares
+                            cell.key === todayKey &&
+                              'ring-1 ring-foreground/40 ring-offset-1 ring-offset-background',
                           )}
                         />
                       </TooltipTrigger>
@@ -126,17 +156,7 @@ export function ActivityHeatmap({ daily }: { daily: Record<string, DayActivity> 
       <div className="flex items-center justify-end gap-1 text-[10px] text-muted-foreground">
         <span>{t('stats.less')}</span>
         {Array.from({ length: LEVELS + 1 }, (_, i) => (
-          <div
-            key={i}
-            className={cn(
-              'size-[11px] rounded-[2px]',
-              i === 0 && 'bg-muted',
-              i === 1 && 'bg-primary/25',
-              i === 2 && 'bg-primary/50',
-              i === 3 && 'bg-primary/75',
-              i === 4 && 'bg-primary',
-            )}
-          />
+          <div key={i} className={cn('size-[11px] rounded-[2px]', LEVEL_CLASS[i])} />
         ))}
         <span>{t('stats.more')}</span>
       </div>

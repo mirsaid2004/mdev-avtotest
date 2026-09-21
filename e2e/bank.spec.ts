@@ -53,7 +53,6 @@ test.describe('i18n', () => {
   const cases = [
     { lang: 'ru', nav: 'Главная', home: 'Сегодня' },
     { lang: 'uzc', nav: 'Бош саҳифа', home: 'Бугун' },
-    { lang: 'kaa', nav: 'Bas bet', home: 'Búgin' },
     { lang: 'uzb', nav: 'Bosh sahifa', home: 'Bugun' },
   ]
 

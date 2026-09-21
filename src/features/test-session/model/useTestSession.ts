@@ -165,12 +165,16 @@ export function useTestSession({
     [testId, mode, questionIds, setActiveSession],
   )
 
-  // establish the session on first mount so a resume exists even before the
-  // first answer
+  // Establish the session once, so a resume exists even before the first
+  // answer. Keyed off a ref rather than persist's identity: persist changes
+  // whenever questionIds does, and re-running it here would write the session
+  // on every render.
+  const established = useRef(false)
   useEffect(() => {
-    if (!submitted) persist()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [persist])
+    if (established.current || submitted) return
+    established.current = true
+    persist()
+  }, [persist, submitted])
 
   // --- actions ------------------------------------------------------------
 

@@ -1,0 +1,42 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# SPA routing: every unknown path renders the app, which then routes it.
+# Netlify serves real files first, so /data/*.json and /assets/* are unaffected -
+# but only when they actually exist in the publish directory. If the bank ever
+# fails to build, requests for it land here and come back as HTML; the app's own
+# query error state catches that and shows "could not load the question bank".
+# The real guard is that `npm run build` now generates the data - see
+# e2e/deploy.spec.ts, which fails the suite if dist/data is missing.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Hashed build output never changes under the same name.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# The question bank changes only when the app is rebuilt, and the service
+# worker revisions it, so let the browser hold it but revalidate.
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Never cache the worker itself, or a stale one pins the app to an old build.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

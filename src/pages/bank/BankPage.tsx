@@ -4,6 +4,7 @@ import { cn } from '@/shared/lib'
 import { useLanguage } from '@/shared/i18n/useLanguage'
 import { Button } from '@/shared/ui/button'
 import { Skeleton } from '@/shared/ui/skeleton'
+import { Alert, AlertDescription, AlertTitle } from '@/shared/ui/alert'
 import { useQuestions } from '@/entities/question'
 import { useProgress } from '@/entities/progress'
 import { useQuestionSearch, type BankFilter } from '@/features/question-search'
@@ -20,7 +21,7 @@ const FILTERS: { value: BankFilter; key: string }[] = [
 export function BankPage() {
   const { t } = useTranslation()
   const { language } = useLanguage()
-  const { data, isPending } = useQuestions()
+  const { data, isPending, isError } = useQuestions()
   const { stats } = useProgress()
 
   const search = useQuestionSearch(data, stats, language)
@@ -79,7 +80,12 @@ export function BankPage() {
         ))}
       </div>
 
-      {isPending ? (
+      {isError ? (
+        <Alert variant="destructive">
+          <AlertTitle>{t('state.error')}</AlertTitle>
+          <AlertDescription>{t('state.errorBank')}</AlertDescription>
+        </Alert>
+      ) : isPending ? (
         <div className="space-y-2">
           {Array.from({ length: 8 }, (_, i) => (
             <Skeleton key={i} className="h-16 w-full" />
