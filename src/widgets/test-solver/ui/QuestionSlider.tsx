@@ -53,6 +53,10 @@ export function QuestionSlider({
         modules={[FreeMode, Mousewheel, Navigation]}
         slidesPerView="auto"
         spaceBetween={6}
+        // the current tab's ring sticks out 4px, and the strip clips its
+        // overflow - without room at the ends the first and last get cut off
+        slidesOffsetBefore={6}
+        slidesOffsetAfter={6}
         freeMode={{ enabled: true, momentumBounce: false }}
         mousewheel={{
           // a plain vertical wheel scrolls the strip sideways, which is the

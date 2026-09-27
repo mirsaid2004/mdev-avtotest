@@ -35,6 +35,29 @@ test.describe('training test', () => {
     for (let i = 0; i < count; i++) await expect(answers(page).nth(i)).toBeDisabled()
   })
 
+  test('the header switches the question language without losing progress', async ({ page }) => {
+    await page.goto('/test/t20-1')
+    await answers(page).first().click()
+    await expect(page.getByText('20 savolli test №1')).toBeVisible()
+    const uz = await answers(page).first().innerText()
+
+    const toggle = page.getByTestId('language-toggle')
+    await toggle.getByRole('radio', { name: 'Русский' }).click()
+    await expect(toggle.getByRole('radio', { name: 'Русский' })).toHaveAttribute('aria-checked', 'true')
+    await expect(page.getByText('Тест №1 · 20 вопросов')).toBeVisible()
+    await expect(answers(page).first()).not.toHaveText(uz)
+
+    // same question, answer still locked in
+    await expect(page.getByText('1 / 20')).toBeVisible()
+    await expect(page.locator('[data-testid="answer-option"][data-state="correct"]')).toHaveCount(1)
+  })
+
+  test('the title uses the listed number, not the id suffix', async ({ page }) => {
+    // t10-5 is the first ten-question test in the listing
+    await page.goto('/test/t10-5')
+    await expect(page.getByText('10 savolli test №1')).toBeVisible()
+  })
+
   test('the slider navigates between questions', async ({ page }) => {
     await page.goto('/test/t20-1')
     await page.getByRole('tab').nth(4).click()

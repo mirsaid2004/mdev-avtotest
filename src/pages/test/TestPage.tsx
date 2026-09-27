@@ -58,19 +58,19 @@ export function TestPage() {
    */
   const resolvedRef = useRef<{
     testId: string
-    result: { questions: Question[]; title: string; size: 10 | 20 }
+    result: { questions: Question[]; size: 10 | 20 }
   } | null>(null)
 
-  const { questions, title, size } = useMemo(() => {
+  const { questions, size } = useMemo(() => {
     const map = questionsQuery.map
-    if (map.size === 0) return { questions: [] as Question[], title: '', size: 20 as const }
+    if (map.size === 0) return { questions: [] as Question[], size: 20 as const }
 
     if (resolvedRef.current?.testId === testId) return resolvedRef.current.result
 
     const resolve = (ids: number[]) =>
       ids.map((id) => map.get(id)).filter((q): q is Question => Boolean(q))
 
-    const pin = (result: { questions: Question[]; title: string; size: 10 | 20 }) => {
+    const pin = (result: { questions: Question[]; size: 10 | 20 }) => {
       resolvedRef.current = { testId, result }
       return result
     }
@@ -79,7 +79,6 @@ export function TestPage() {
     if (resume) {
       return pin({
         questions: resolve(resume.questionIds),
-        title: titleFor(testId, resume.questionIds.length),
         size: resume.questionIds.length > 10 ? 20 : 10,
       })
     }
@@ -88,7 +87,6 @@ export function TestPage() {
       const all = [...map.values()]
       return pin({
         questions: sample(all, EXAM.questionCount),
-        title: 'Examination',
         size: 20,
       })
     }
@@ -103,16 +101,15 @@ export function TestPage() {
               PRACTICE_SIZE - weak.length,
             )
           : []
-      return pin({ questions: [...weak, ...filler], title: 'Practice', size: 20 })
+      return pin({ questions: [...weak, ...filler], size: 20 })
     }
 
     const template = testsQuery.data?.find((x) => x.id === testId)
     // not pinned: the template list may still be arriving, so keep retrying
     // until it either resolves or genuinely doesn't exist
-    if (!template) return { questions: [] as Question[], title: '', size: 20 as const }
+    if (!template) return { questions: [] as Question[], size: 20 as const }
     return pin({
       questions: resolve(template.questionIds),
-      title: `${template.size}-question test #${template.number}`,
       size: template.size,
     })
   }, [questionsQuery.map, testsQuery.data, testId, resume, weakIds])
@@ -142,6 +139,17 @@ export function TestPage() {
 
   if (questions.length === 0) return <Navigate to={ROUTES.home} replace />
 
+  // translated at render, not pinned with the questions, so it follows a
+  // language switch mid-test. The number comes from the template: ids keep the
+  // source numbering (t10-5 is listed as test 1), so the id suffix is wrong.
+  const number = testsQuery.data?.find((x) => x.id === testId)?.number
+  const title =
+    mode === 'exam'
+      ? t('home.exam')
+      : mode === 'practice'
+        ? t('home.practice')
+        : t('tests.title', { count: questions.length, n: number })
+
   return (
     <TestSolver
       testId={testId}
@@ -152,11 +160,4 @@ export function TestPage() {
       resume={resume}
     />
   )
-}
-
-function titleFor(testId: string, count: number) {
-  if (testId === 'exam') return 'Examination'
-  if (testId === 'practice') return 'Practice'
-  const n = testId.split('-')[1]
-  return `${count}-question test #${n}`
 }

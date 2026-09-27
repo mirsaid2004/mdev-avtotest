@@ -37,7 +37,8 @@
     "system": "Tizim"
   },
   "language": {
-    "label": "Til"
+    "label": "Til",
+    "switch": "Savollar tili"
   },
   "home": {
     "unfinished": "Tugallanmagan test",
@@ -59,7 +60,8 @@
   "tests": {
     "meta": "{{count}} ta savol · {{minutes}} daqiqa · darhol javob",
     "tab20": "20 savol",
-    "tab10": "10 savol"
+    "tab10": "10 savol",
+    "title": "{{count}} savolli test №{{n}}"
   },
   "test": {
     "question": "Savol",

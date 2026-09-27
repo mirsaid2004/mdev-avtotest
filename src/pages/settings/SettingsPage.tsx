@@ -116,7 +116,7 @@ export function SettingsPage() {
             <DialogTitle>{t('settings.resetTitle')}</DialogTitle>
             <DialogDescription>{t('settings.resetBody')}</DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmReset(false)}>
               {t('action.cancel')}
             </Button>

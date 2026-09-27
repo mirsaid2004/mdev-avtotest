@@ -89,7 +89,7 @@ export function CompletionDialog({
           {correct} / {total} · {Math.round((correct / total) * 100)}%
         </p>
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        <DialogFooter>
           <Button variant="outline" onClick={onReplay} data-testid="replay">
             <RotateCcw className="size-4" />
             {t('test.replay')}

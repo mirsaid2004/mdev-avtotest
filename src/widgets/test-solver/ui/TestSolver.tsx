@@ -21,6 +21,7 @@ import { ROUTES } from '@/app/router/routes'
 import { TimerDisplay } from './TimerDisplay'
 import { CompletionDialog } from './CompletionDialog'
 import { QuestionSlider } from './QuestionSlider'
+import { LanguageToggle } from './LanguageToggle'
 
 interface Props {
   testId: string
@@ -102,6 +103,8 @@ export function TestSolver({ testId, title, mode, questions, durationMs, resume 
               )}
             </p>
           </div>
+
+          <LanguageToggle />
 
           {durationMs > 0 && (
             <TimerDisplay
@@ -201,7 +204,7 @@ export function TestSolver({ testId, title, mode, questions, durationMs, resume 
             <DialogTitle>{t('test.leaveTitle')}</DialogTitle>
             <DialogDescription>{t('test.leaveBody')}</DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmExit(false)}>
               {t('action.continue')}
             </Button>
@@ -232,7 +235,7 @@ export function TestSolver({ testId, title, mode, questions, durationMs, resume 
                 : t('test.submitAllAnswered')}
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmSubmit(false)}>
               {t('action.cancel')}
             </Button>

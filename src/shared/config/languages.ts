@@ -1,7 +1,7 @@
 export const LANGUAGES = [
-  { code: 'uzb', label: "O'zbekcha", nativeLabel: "O'zbekcha" },
-  { code: 'uzc', label: 'Ўзбекча', nativeLabel: 'Ўзбекча' },
-  { code: 'ru', label: 'Русский', nativeLabel: 'Русский' },
+  { code: 'uzb', label: "O'zbekcha", nativeLabel: "O'zbekcha", short: 'UZ' },
+  { code: 'uzc', label: 'Ўзбекча', nativeLabel: 'Ўзбекча', short: 'ЎЗ' },
+  { code: 'ru', label: 'Русский', nativeLabel: 'Русский', short: 'RU' },
 ] as const
 
 export type LanguageCode = (typeof LANGUAGES)[number]['code']
