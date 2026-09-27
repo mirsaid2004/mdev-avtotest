@@ -55,7 +55,9 @@ export function InstallCard() {
   return (
     <>
       <Card className="mb-4 border-primary/40 bg-primary/5" data-testid="install-card">
-        <CardContent className="flex items-center gap-3 p-4">
+        {/* on phones the action drops to its own row - side by side it squeezes
+            the text into a sliver, worst with the longer iOS label */}
+        <CardContent className="flex flex-wrap items-center gap-3 p-4">
           <Logo className="size-10 shrink-0" />
 
           <div className="min-w-0 flex-1">
@@ -67,7 +69,7 @@ export function InstallCard() {
           <Button
             size="sm"
             onClick={() => (canPrompt ? void install() : setShowIOS(true))}
-            className="shrink-0"
+            className="order-last w-full shrink-0 sm:order-none sm:w-auto"
           >
             {canPrompt ? <Download className="size-4" /> : <SquarePlus className="size-4" />}
             {canPrompt ? t('install.action') : t('install.howTo')}
