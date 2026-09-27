@@ -3,11 +3,25 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import legacy from '@vitejs/plugin-legacy'
+import browserslist from 'browserslist'
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    // The supported floor is iOS 15.4 (an iPhone 7 tops out at 15.8; below
+    // 15.4 Tailwind's @layer styles are ignored) - see "browserslist" in
+    // package.json. Vite's default target is newer, and one
+    // unsupported bit of syntax (e.g. a class `static {}` block) makes old
+    // Safari reject the whole bundle: a blank page. This lowers the syntax to
+    // those targets and adds core-js polyfills (toSorted() etc.) only where
+    // they're missing. No ES5 build: every target runs ES modules natively.
+    legacy({
+      modernTargets: browserslist.loadConfig({ path: import.meta.dirname }),
+      modernPolyfills: true,
+      renderLegacyChunks: false,
+    }),
     VitePWA({
       registerType: 'prompt',
       includeAssets: ['favicon-32.png', 'favicon-16.png', 'icons/apple-touch-icon.png'],
