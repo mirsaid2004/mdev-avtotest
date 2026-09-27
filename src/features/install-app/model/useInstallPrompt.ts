@@ -32,6 +32,31 @@ function isIOS(): boolean {
 }
 
 /**
+ * Which kind of iOS browser we're in - it decides what the install dialog says.
+ *
+ * - `safari`: Share -> "Add to Home Screen".
+ * - `browser`: Chrome, Firefox, Edge... Since iOS 16.4 they can add to the
+ *   home screen too, but their Share button lives in the address bar.
+ * - `inapp`: a webview inside Telegram, Instagram, the Google app etc. These
+ *   have no "Add to Home Screen" at all - the page has to be opened in Safari.
+ *
+ * Telegram's default "In-App Safari" is an SFSafariViewController, whose user
+ * agent is identical to Safari's, so it reads as `safari` here. It can't add
+ * to the home screen either, which is why the Safari instructions end with an
+ * "open it in Safari" fallback rather than trusting this.
+ */
+export type IOSBrowser = 'safari' | 'browser' | 'inapp'
+
+function detectIOSBrowser(): IOSBrowser {
+  const ua = navigator.userAgent
+  if (/FBAN|FBAV|Instagram|Telegram|Line\/|TikTok|musical_ly|Snapchat|GSA\//.test(ua)) return 'inapp'
+  if (/CriOS|FxiOS|EdgiOS|OPiOS|YaBrowser|DuckDuckGo/.test(ua)) return 'browser'
+  // an embedded WKWebView drops the trailing "Safari/xxx" token real browsers send
+  if (!/Safari\//.test(ua)) return 'inapp'
+  return 'safari'
+}
+
+/**
  * Drives the install card.
  *
  * Chromium fires `beforeinstallprompt` and lets us trigger the native dialog.
@@ -92,12 +117,15 @@ export function useInstallPrompt() {
   }, [])
 
   const ios = isIOS()
+  const iosBrowser = ios ? detectIOSBrowser() : null
 
   return {
     /** the native dialog is available */
     canPrompt: Boolean(deferred),
     /** iOS can install, but only via the share sheet - show instructions */
     needsIOSInstructions: ios && !installed,
+    /** which iOS instructions to show; null off iOS */
+    iosBrowser,
     installed,
     dismissed,
     visible: !installed && !dismissed && (Boolean(deferred) || (ios && !installed)),

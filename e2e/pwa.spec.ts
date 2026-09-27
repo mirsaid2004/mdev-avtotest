@@ -118,7 +118,7 @@ test.describe('install card', () => {
     await expect(page.getByTestId('install-card')).toBeVisible()
   })
 
-  test('dismissing hides it and is remembered across reloads', async ({ page }) => {
+  test('dismissing hides it for this page load only', async ({ page }) => {
     await page.goto('/')
     await fireInstallable(page)
 
@@ -128,9 +128,10 @@ test.describe('install card', () => {
     await card.getByRole('button', { name: /Yopish|Close/ }).click()
     await expect(card).toHaveCount(0)
 
+    // dismissal is deliberately not persisted - a refresh invites again
     await page.reload()
     await fireInstallable(page)
-    await expect(page.getByTestId('install-card')).toHaveCount(0)
+    await expect(page.getByTestId('install-card')).toBeVisible()
   })
 
   test('never shows when already running as an installed app', async ({ page }) => {
@@ -146,6 +147,38 @@ test.describe('install card', () => {
     await fireInstallable(page)
     await expect(page.getByTestId('install-card')).toHaveCount(0)
   })
+})
+
+test.describe('install card on iOS', () => {
+  // detection is user-agent based, so every project can play an iPhone
+  const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko)'
+  const cases = [
+    { name: 'Safari', ua: `${IPHONE} Version/18.0 Mobile/15E148 Safari/604.1`, browser: 'safari', title: "Bosh ekranga qo'shish" },
+    { name: 'Chrome', ua: `${IPHONE} CriOS/129.0.6668.46 Mobile/15E148 Safari/604.1`, browser: 'browser', title: "Bosh ekranga qo'shish" },
+    { name: 'Telegram webview', ua: `${IPHONE} Mobile/15E148 Telegram-iOS/11.1`, browser: 'inapp', title: "Safari'da oching" },
+    { name: 'Instagram webview', ua: `${IPHONE} Mobile/15E148 Instagram 350.0.0.0`, browser: 'inapp', title: "Safari'da oching" },
+  ]
+
+  for (const c of cases) {
+    test.describe(c.name, () => {
+      test.use({ userAgent: c.ua })
+
+      test('offers instructions, not a fake download', async ({ page }) => {
+        await page.goto('/')
+        const card = page.getByTestId('install-card')
+        await expect(card).toBeVisible()
+
+        // there is no install API on iOS - the button must not claim to install
+        await card.getByRole('button', { name: "Qanday o'rnatiladi" }).click()
+
+        const dialog = page.getByTestId('install-ios-dialog')
+        await expect(dialog).toBeVisible()
+        await expect(dialog).toHaveAttribute('data-browser', c.browser)
+        await expect(dialog.getByRole('heading', { name: c.title })).toBeVisible()
+        await expect(dialog.getByRole('button', { name: 'Havolani nusxalash' })).toBeVisible()
+      })
+    })
+  }
 })
 
 test.describe('logo', () => {

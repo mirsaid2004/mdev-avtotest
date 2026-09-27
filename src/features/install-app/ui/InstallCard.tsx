@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Download, Share, SquarePlus, X } from 'lucide-react'
+import { toast } from 'sonner'
+import { Compass, Copy, Download, Share, SquarePlus, ToggleRight, X } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent } from '@/shared/ui/card'
 import { Logo } from '@/shared/ui/logo'
@@ -13,6 +14,18 @@ import {
 } from '@/shared/ui/dialog'
 import { useInstallPrompt } from '../model/useInstallPrompt'
 
+function Step({ n, icon, children }: { n: number; icon: ReactNode; children: ReactNode }) {
+  return (
+    <li className="flex items-center gap-3">
+      <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold">
+        {n}
+      </span>
+      {icon}
+      <span>{children}</span>
+    </li>
+  )
+}
+
 /**
  * Invitation to install. Renders nothing when the app is already installed,
  * when the platform can't install it, or once dismissed.
@@ -20,9 +33,24 @@ import { useInstallPrompt } from '../model/useInstallPrompt'
 export function InstallCard() {
   const { t } = useTranslation()
   const [showIOS, setShowIOS] = useState(false)
-  const { visible, canPrompt, needsIOSInstructions, install, dismiss } = useInstallPrompt()
+  const { visible, canPrompt, needsIOSInstructions, iosBrowser, install, dismiss } =
+    useInstallPrompt()
 
   if (!visible) return null
+
+  // the way out of a browser that can't install: paste the link into Safari
+  const copyLink = async () => {
+    const url = `${window.location.origin}/`
+    try {
+      await navigator.clipboard.writeText(url)
+      toast.success(t('install.linkCopied'))
+    } catch {
+      toast(url)
+    }
+  }
+
+  const iconClass = 'size-4 shrink-0 text-primary'
+  const inapp = iosBrowser === 'inapp'
 
   return (
     <>
@@ -35,13 +63,14 @@ export function InstallCard() {
             <p className="text-xs text-muted-foreground">{t('install.body')}</p>
           </div>
 
+          {/* iOS can't be installed from a button, so don't promise a download */}
           <Button
             size="sm"
             onClick={() => (canPrompt ? void install() : setShowIOS(true))}
             className="shrink-0"
           >
-            <Download className="size-4" />
-            {t('install.action')}
+            {canPrompt ? <Download className="size-4" /> : <SquarePlus className="size-4" />}
+            {canPrompt ? t('install.action') : t('install.howTo')}
           </Button>
 
           <Button
@@ -58,27 +87,49 @@ export function InstallCard() {
 
       {/* iOS can install, but only through the share sheet - there is no API */}
       <Dialog open={showIOS && needsIOSInstructions} onOpenChange={setShowIOS}>
-        <DialogContent>
+        <DialogContent data-testid="install-ios-dialog" data-browser={iosBrowser ?? undefined}>
           <DialogHeader>
-            <DialogTitle>{t('install.iosTitle')}</DialogTitle>
-            <DialogDescription>{t('install.iosBody')}</DialogDescription>
+            <DialogTitle>{inapp ? t('install.inappTitle') : t('install.iosTitle')}</DialogTitle>
+            <DialogDescription>
+              {inapp
+                ? t('install.inappBody')
+                : iosBrowser === 'browser'
+                  ? t('install.iosBodyBrowser')
+                  : t('install.iosBody')}
+            </DialogDescription>
           </DialogHeader>
-          <ol className="space-y-3 text-sm">
-            <li className="flex items-center gap-3">
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold">
-                1
-              </span>
-              <Share className="size-4 shrink-0 text-primary" />
-              {t('install.iosStep1')}
-            </li>
-            <li className="flex items-center gap-3">
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold">
-                2
-              </span>
-              <SquarePlus className="size-4 shrink-0 text-primary" />
-              {t('install.iosStep2')}
-            </li>
-          </ol>
+
+          {inapp ? (
+            <ol className="space-y-3 text-sm">
+              <Step n={1} icon={<Compass className={iconClass} />}>
+                {t('install.inappStep1')}
+              </Step>
+              <Step n={2} icon={<SquarePlus className={iconClass} />}>
+                {t('install.inappStep2')}
+              </Step>
+            </ol>
+          ) : (
+            <ol className="space-y-3 text-sm">
+              <Step n={1} icon={<Share className={iconClass} />}>
+                {iosBrowser === 'browser' ? t('install.iosStep1Browser') : t('install.iosStep1')}
+              </Step>
+              <Step n={2} icon={<SquarePlus className={iconClass} />}>
+                {t('install.iosStep2')}
+              </Step>
+              <Step n={3} icon={<ToggleRight className={iconClass} />}>
+                {t('install.iosStep3')}
+              </Step>
+            </ol>
+          )}
+
+          <div className="space-y-2 border-t pt-3">
+            {/* Telegram's in-app Safari looks like Safari but can't install */}
+            {!inapp && <p className="text-xs text-muted-foreground">{t('install.iosFallback')}</p>}
+            <Button variant="outline" size="sm" onClick={() => void copyLink()} className="w-full">
+              <Copy className="size-4" />
+              {t('install.copyLink')}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </>
