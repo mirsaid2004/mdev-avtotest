@@ -1,10 +1,10 @@
 import { useDeferredValue, useMemo, useState } from 'react'
 import { MASTERY_STREAK } from '@/shared/config'
 import type { LanguageCode } from '@/shared/config'
-import type { Question } from '@/entities/question'
+import { NUMBER_QUESTION_IDS, type Question } from '@/entities/question'
 import type { QuestionStat } from '@/entities/progress'
 
-export type BankFilter = 'all' | 'weak' | 'mastered' | 'unseen' | 'image'
+export type BankFilter = 'all' | 'weak' | 'mastered' | 'unseen' | 'image' | 'numbers'
 
 /** Strips diacritics and apostrophe variants so "to'g'ri" matches "togri". */
 function normalize(value: string): string {
@@ -61,6 +61,9 @@ export function useQuestionSearch(
           break
         case 'image':
           if (!q.media) return false
+          break
+        case 'numbers':
+          if (!NUMBER_QUESTION_IDS.has(q.id)) return false
           break
       }
 

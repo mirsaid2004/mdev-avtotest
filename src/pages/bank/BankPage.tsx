@@ -16,6 +16,7 @@ const FILTERS: { value: BankFilter; key: string }[] = [
   { value: 'mastered', key: 'bank.filter.mastered' },
   { value: 'unseen', key: 'bank.filter.unseen' },
   { value: 'image', key: 'bank.filter.image' },
+  { value: 'numbers', key: 'bank.filter.numbers' },
 ]
 
 export function BankPage() {

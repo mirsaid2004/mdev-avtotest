@@ -23,6 +23,12 @@ test.describe('question bank', () => {
     expect(filtered).not.toContain('1353')
   })
 
+  test('numbers filter shows only the number-based questions', async ({ page }) => {
+    await page.goto('/bank')
+    await page.getByRole('button', { name: 'Raqamli' }).click()
+    await expect(page.locator('header p').first()).toHaveText('107 ta savol')
+  })
+
   test('search ignores apostrophe variants', async ({ page }) => {
     await page.goto('/bank')
     const search = page.getByRole('searchbox')

@@ -772,7 +772,7 @@ Barrel: `useTestSession`.
 
 ### `features/question-search/model/useQuestionSearch.ts`
 
-**`type BankFilter = 'all' | 'weak' | 'mastered' | 'unseen' | 'image'`**
+**`type BankFilter = 'all' | 'weak' | 'mastered' | 'unseen' | 'image' | 'numbers'`** — `numbers` matches the hand-curated `NUMBER_QUESTION_IDS` set in `entities/question/model/numberQuestions.ts`
 
 **`normalize(value: string): string`** *(internal)* — lowercases, applies
 Unicode NFD normalisation and strips combining diacritics, then strips a
@@ -1227,7 +1227,7 @@ stale/bookmarked link after a progress reset).
 
 ### `pages/bank/BankPage.tsx`
 
-**`FILTERS`** *(internal, module-level)* — the five `BankFilter` values
+**`FILTERS`** *(internal, module-level)* — the six `BankFilter` values
 paired with their i18n keys, in display order.
 
 **`BankPage()`** — search + filter + browse over the whole question bank.

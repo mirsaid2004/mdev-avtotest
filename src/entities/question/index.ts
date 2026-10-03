@@ -1,4 +1,5 @@
 export type { Question, Answer, Localized } from './model/types'
+export { NUMBER_QUESTION_IDS } from './model/numberQuestions'
 export { useQuestions, useQuestionMap, questionsQueryKey } from './model/useQuestions'
 export { fetchQuestions } from './api/questionsApi'
 export { QuestionView } from './ui/QuestionView'
